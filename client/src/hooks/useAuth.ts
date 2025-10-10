@@ -7,13 +7,13 @@ import { IUser } from "../types/user";
 export const useAuth = () => {
   const router = useRouter();
   const [user, setUser] = useState<IUser | null>(null);
-  const [loading, setLoading] = useState(true); // NEW: loading state while checking localStorage
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const raw = localStorage.getItem("user");
       if (raw) setUser(JSON.parse(raw));
-      setLoading(false); // done checking
+      setLoading(false); 
     }
   }, []);
 

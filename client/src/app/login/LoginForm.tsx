@@ -1,4 +1,3 @@
-// src/components/LoginForm.tsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -32,43 +31,44 @@ export default function LoginForm() {
     try {
       await login(email, password);
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err?.response?.data?.message ?? "Login failed");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error?.response?.data?.message ?? "Login failed");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-2xl font-semibold mb-4">Login</h2>
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Login</h2>
 
-      {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
+      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded border border-red-200">{error}</div>}
 
-      <label className="block mb-3">
-        <span className="text-sm">Email</span>
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full border px-3 py-2 rounded"
+          className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="email"
           required
         />
-      </label>
+      </div>
 
-      <label className="block mb-4">
-        <span className="text-sm">Password</span>
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
         <input
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full border px-3 py-2 rounded"
+          className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="password"
           required
         />
-      </label>
+      </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+        className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:bg-gray-400"
       >
         {loading ? "Logging in..." : "Login"}
       </button>

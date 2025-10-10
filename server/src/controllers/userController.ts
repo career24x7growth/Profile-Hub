@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import User, { IUser } from "../models/user";
-import { signupValidation } from "../validations/authValidation";
+import { registerValidation } from "../validations/authValidation";
 
 // Extending Request
 interface AuthRequest extends Request {

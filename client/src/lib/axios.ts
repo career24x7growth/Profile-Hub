@@ -16,7 +16,7 @@ if (typeof window !== "undefined") {
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
       return config;

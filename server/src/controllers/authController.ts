@@ -1,12 +1,56 @@
 import { Request, Response } from "express";
-import User, { IUser } from "../models/user";
-import { signupValidation, loginValidation } from "../validations/authValidation";
-import { hashPassword, comparePassword } from "../utils/hashPassword";
+import User from "../models/user";
+import { comparePassword, hashPassword } from "../utils/hashPassword"; // your helper for bcrypt
 import { generateToken } from "../utils/generateTokens";
+import jwt from "jsonwebtoken";
+import { registerValidation, loginValidation } from "../validations/authValidation";
 
-export const signup = async (req: Request, res: Response) => {
+
+export const login = async (req: Request, res: Response) => {
   try {
-    const { error } = signupValidation.validate(req.body);
+    const { email, password } = req.body;
+
+    // Check if superadmin login
+    if (
+      email === process.env.SUPERADMIN_EMAIL &&
+      password === process.env.SUPERADMIN_PASSWORD
+    ) {
+      const token = jwt.sign(
+        { id: "superadmin", role: "superadmin" },
+        process.env.JWT_SECRET!,
+        { expiresIn: "1d" }
+      );
+      return res.json({
+        token,
+        user: {
+          _id: "superadmin",
+          name: "Super Admin",
+          email: process.env.SUPERADMIN_EMAIL,
+          role: "superadmin",
+        },
+      });
+    }
+
+    // Normal user login
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+
+    const token = generateToken(user._id, user.role);
+
+    res.json({ token, user });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Server Error";
+    res.status(500).json({ message });
+  }
+};
+
+
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { error } = registerValidation.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
     const { name, email, password, role, age, phone, address, city, country, zipCode } = req.body;
@@ -36,25 +80,4 @@ export const signup = async (req: Request, res: Response) => {
   res.status(500).json({ message });
 }
 
-};
-
-
-export const login = async (req: Request, res: Response) => {
-  try {
-    const { error } = loginValidation.validate(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
-
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
-
-    const isMatch = await comparePassword(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-
-    const token = generateToken(user._id, user.role);
-    res.status(200).json({ token, user });
-  } catch (err) {
-    res.status(500).json({ message: "Server Error" });
-  }
 };

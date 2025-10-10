@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import User from "../models/user";
-import { signupValidation } from "../validations/authValidation";
+import { registerValidation } from "../validations/authValidation";
 import { hashPassword } from "../utils/hashPassword";
 
 // POST /api/superadmin/addUser
 export const addUserBySuperAdmin = async (req: Request, res: Response) => {
   try {
-    const { error } = signupValidation.validate(req.body);
+    const { error } = registerValidation.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
     const { name, email, password, role, age, phone, address, city, country, zipCode } = req.body;

@@ -1,94 +1,93 @@
-// src/components/RegisterForm.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { IUser } from "../../types/user";
 import api from "../../lib/axios";
-import { useRouter } from "next/navigation";
+import { useAuth } from "../../hooks/useAuth";
 
-export default function RegisterForm() {
+export default function UserProfilePage() {
+  const { isLoggedIn } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const userId = params.id as string;
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "user",
-    age: "",
-    phone: "",
-    address: "",
-    city: "",
-    country: "",
-    zipCode: "",
-  });
+  const [user, setUser] = useState<IUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const onChange = (k: string, v: string) => setForm((s) => ({ ...s, [k]: v }));
-
-  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
-
-  const validate = () => {
-    if (!form.name || form.name.length < 3) {
-      setError("Name must be at least 3 characters");
-      return false;
-    }
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) {
-      setError("Enter a valid email");
-      return false;
-    }
-    if (!passwordPattern.test(form.password)) {
-      setError(
-        "Password must be at least 8 chars, include uppercase, lowercase, number and special char"
-      );
-      return false;
-    }
-    setError(null);
-    return true;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setLoading(true);
-    try {
-      // Public registration uses /api/auth/signup
-      await api.post("/api/auth/signup", {
-        ...form,
-        age: form.age ? Number(form.age) : undefined,
-      });
-      setLoading(false);
+  useEffect(() => {
+    if (!isLoggedIn) {
       router.push("/login");
-    } catch (err: any) {
-      setLoading(false);
-      setError(err?.response?.data?.message ?? "Registration failed");
+      return;
     }
-  };
+
+    const fetchUser = async () => {
+      try {
+        const res = await api.get(`/api/users/${userId}`);
+        setUser(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, [isLoggedIn, userId, router]);
+
+  if (!isLoggedIn) return null;
+  if (loading) return <div className="text-center py-8 text-gray-500">Loading...</div>;
+  if (!user) return <div className="text-center py-8 text-red-600">User not found</div>;
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-2xl font-semibold mb-4">Register</h2>
-
-      {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <input placeholder="Name" value={form.name} onChange={(e) => onChange("name", e.target.value)} className="border px-3 py-2 rounded" />
-        <input placeholder="Email" type="email" value={form.email} onChange={(e) => onChange("email", e.target.value)} className="border px-3 py-2 rounded" />
-        <input placeholder="Password" type="password" value={form.password} onChange={(e) => onChange("password", e.target.value)} className="border px-3 py-2 rounded" />
-        <select value={form.role} onChange={(e) => onChange("role", e.target.value)} className="border px-3 py-2 rounded">
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <input placeholder="Age" value={form.age} onChange={(e) => onChange("age", e.target.value)} className="border px-3 py-2 rounded" />
-        <input placeholder="Phone" value={form.phone} onChange={(e) => onChange("phone", e.target.value)} className="border px-3 py-2 rounded" />
-        <input placeholder="Address" value={form.address} onChange={(e) => onChange("address", e.target.value)} className="border px-3 py-2 rounded" />
-        <input placeholder="City" value={form.city} onChange={(e) => onChange("city", e.target.value)} className="border px-3 py-2 rounded" />
-        <input placeholder="Country" value={form.country} onChange={(e) => onChange("country", e.target.value)} className="border px-3 py-2 rounded" />
-        <input placeholder="ZIP Code" value={form.zipCode} onChange={(e) => onChange("zipCode", e.target.value)} className="border px-3 py-2 rounded" />
-      </div>
-
-      <button className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600 transition" disabled={loading}>
-        {loading ? "Registering..." : "Register"}
+    <div className="max-w-2xl mx-auto">
+      <button
+        onClick={() => router.push('/dashboard')}
+        className="mb-4 px-4 py-2 text-blue-600 hover:text-blue-800 transition"
+      >
+        ← Back to Users
       </button>
-    </form>
+
+      <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="flex items-center gap-4 mb-6 pb-6 border-b">
+          <div className="w-20 h-20 rounded-full bg-blue-500 text-white flex items-center justify-center uppercase font-bold text-2xl">
+            {user.name.charAt(0)}
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">{user.name}</h2>
+            <p className="text-gray-600">{user.role}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm text-gray-500">Email</label>
+            <p className="font-medium text-gray-800">{user.email}</p>
+          </div>
+          <div>
+            <label className="text-sm text-gray-500">Age</label>
+            <p className="font-medium text-gray-800">{user.age ?? "-"}</p>
+          </div>
+          <div>
+            <label className="text-sm text-gray-500">Phone</label>
+            <p className="font-medium text-gray-800">{user.phone ?? "-"}</p>
+          </div>
+          <div>
+            <label className="text-sm text-gray-500">Address</label>
+            <p className="font-medium text-gray-800">{user.address ?? "-"}</p>
+          </div>
+          <div>
+            <label className="text-sm text-gray-500">City</label>
+            <p className="font-medium text-gray-800">{user.city ?? "-"}</p>
+          </div>
+          <div>
+            <label className="text-sm text-gray-500">Country</label>
+            <p className="font-medium text-gray-800">{user.country ?? "-"}</p>
+          </div>
+          <div>
+            <label className="text-sm text-gray-500">ZIP Code</label>
+            <p className="font-medium text-gray-800">{user.zipCode ?? "-"}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
