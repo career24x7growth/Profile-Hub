@@ -1,0 +1,14 @@
+// src/types/user.ts
+export interface IUser {
+  _id: string;
+  name: string;
+  email: string;
+  role: "user" | "admin" | "superadmin";
+  age?: number;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  zipCode?: string;
+  createdAt?: string;
+}
