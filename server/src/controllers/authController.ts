@@ -4,6 +4,7 @@ import { comparePassword, hashPassword } from "../utils/hashPassword"; // your h
 import { generateToken } from "../utils/generateTokens";
 import jwt from "jsonwebtoken";
 import { registerValidation, loginValidation } from "../validations/authValidation";
+import { IUser } from "../types/user";
 
 
 export const login = async (req: Request, res: Response) => {
@@ -32,7 +33,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Normal user login
-    const user = await User.findOne({ email });
+    const user: IUser | null = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
     const isMatch = await comparePassword(password, user.password);
@@ -59,8 +60,8 @@ export const register = async (req: Request, res: Response) => {
     if (existingUser) return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await hashPassword(password);
-
-    const user = await User.create({
+    // let user:Document;
+    const user: IUser = await User.create({
       name,
       email,
       password: hashedPassword,
@@ -73,11 +74,11 @@ export const register = async (req: Request, res: Response) => {
       zipCode,
     });
 
-    const token = generateToken(user._id , user.role);
+    const token = generateToken(user._id, user.role);
     res.status(201).json({ token, user });
   } catch (err: unknown) {
-  const message = err instanceof Error ? err.message : "Server Error";
-  res.status(500).json({ message });
-}
+    const message = err instanceof Error ? err.message : "Server Error";
+    res.status(500).json({ message });
+  }
 
 };

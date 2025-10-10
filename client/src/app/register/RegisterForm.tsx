@@ -1,93 +1,154 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { IUser } from "../../types/user";
+import { useState } from "react";
 import api from "../../lib/axios";
-import { useAuth } from "../../hooks/useAuth";
+import { useRouter } from "next/navigation";
 
-export default function UserProfilePage() {
-  const { isLoggedIn } = useAuth();
+export default function Registerdata() {
   const router = useRouter();
-  const params = useParams();
-  const userId = params.id as string;
 
-  const [user, setUser] = useState<IUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "user",
+    age: "",
+    phone: "",
+    address: "",
+    city: "",
+    country: "",
+    zipCode: "",
+  });
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.push("/login");
-      return;
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const onChange = (key: string, value: string) =>
+    setData((prev) => ({ ...prev, [key]: value }));
+
+  const passwordPattern =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+  const validate = () => {
+    if (!data.name || data.name.length < 3) {
+      setError("Name must be at least 3 characters");
+      return false;
     }
+    if (!/^\S+@\S+\.\S+$/.test(data.email)) {
+      setError("Enter a valid email");
+      return false;
+    }
+    if (!passwordPattern.test(data.password)) {
+      setError(
+        "Password must be at least 8 chars, include uppercase, lowercase, number, and special char"
+      );
+      return false;
+    }
+    setError(null);
+    return true;
+  };
 
-    const fetchUser = async () => {
-      try {
-        const res = await api.get(`/api/users/${userId}`);
-        setUser(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, [isLoggedIn, userId, router]);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!validate()) return;
 
-  if (!isLoggedIn) return null;
-  if (loading) return <div className="text-center py-8 text-gray-500">Loading...</div>;
-  if (!user) return <div className="text-center py-8 text-red-600">User not found</div>;
+    setLoading(true);
+    try {
+      await api.post("/api/auth/register", {
+        ...data,
+        age: data.age ? Number(data.age) : undefined,
+      });
+
+      setLoading(false);
+      router.push("/login");
+    } catch (err: any) {
+      setLoading(false);
+      setError(err?.response?.data?.message ?? "Registration failed");
+    }
+  };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <button
-        onClick={() => router.push('/dashboard')}
-        className="mb-4 px-4 py-2 text-blue-600 hover:text-blue-800 transition"
-      >
-        ← Back to Users
-      </button>
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-2xl mx-auto bg-white p-6 rounded shadow"
+    >
+      <h2 className="text-2xl font-semibold mb-4">Register</h2>
 
-      <div className="bg-white p-8 rounded-lg shadow-md">
-        <div className="flex items-center gap-4 mb-6 pb-6 border-b">
-          <div className="w-20 h-20 rounded-full bg-blue-500 text-white flex items-center justify-center uppercase font-bold text-2xl">
-            {user.name.charAt(0)}
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-800">{user.name}</h2>
-            <p className="text-gray-600">{user.role}</p>
-          </div>
-        </div>
+      {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm text-gray-500">Email</label>
-            <p className="font-medium text-gray-800">{user.email}</p>
-          </div>
-          <div>
-            <label className="text-sm text-gray-500">Age</label>
-            <p className="font-medium text-gray-800">{user.age ?? "-"}</p>
-          </div>
-          <div>
-            <label className="text-sm text-gray-500">Phone</label>
-            <p className="font-medium text-gray-800">{user.phone ?? "-"}</p>
-          </div>
-          <div>
-            <label className="text-sm text-gray-500">Address</label>
-            <p className="font-medium text-gray-800">{user.address ?? "-"}</p>
-          </div>
-          <div>
-            <label className="text-sm text-gray-500">City</label>
-            <p className="font-medium text-gray-800">{user.city ?? "-"}</p>
-          </div>
-          <div>
-            <label className="text-sm text-gray-500">Country</label>
-            <p className="font-medium text-gray-800">{user.country ?? "-"}</p>
-          </div>
-          <div>
-            <label className="text-sm text-gray-500">ZIP Code</label>
-            <p className="font-medium text-gray-800">{user.zipCode ?? "-"}</p>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input
+          placeholder="Name"
+          value={data.name}
+          onChange={(e) => onChange("name", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        <input
+          placeholder="Email"
+          type="email"
+          value={data.email}
+          onChange={(e) => onChange("email", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        <input
+          placeholder="Password"
+          type="password"
+          value={data.password}
+          onChange={(e) => onChange("password", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        <select
+          value={data.role}
+          onChange={(e) => onChange("role", e.target.value)}
+          className="border px-3 py-2 rounded"
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <input
+          placeholder="Age"
+          value={data.age}
+          onChange={(e) => onChange("age", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        <input
+          placeholder="Phone"
+          value={data.phone}
+          onChange={(e) => onChange("phone", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        <input
+          placeholder="Address"
+          value={data.address}
+          onChange={(e) => onChange("address", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        <input
+          placeholder="City"
+          value={data.city}
+          onChange={(e) => onChange("city", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        <input
+          placeholder="Country"
+          value={data.country}
+          onChange={(e) => onChange("country", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        <input
+          placeholder="ZIP Code"
+          value={data.zipCode}
+          onChange={(e) => onChange("zipCode", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
       </div>
-    </div>
+
+      <button
+        type="submit"
+        className="mt-4 px-5 py-2 bg-green-600 text-white rounded"
+        disabled={loading}
+      >
+        {loading ? "Registering..." : "Register"}
+      </button>
+    </form>
   );
 }
