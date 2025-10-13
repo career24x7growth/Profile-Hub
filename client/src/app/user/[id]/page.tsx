@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { IUser } from "../../../types/user";
@@ -15,6 +16,7 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<any>({});
+  const [password, setPassword] = useState(""); 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,30 +29,44 @@ export default function UserProfilePage() {
       try {
         const res = await api.get(`/api/users/${userId}`);
         setUser(res.data);
-        setForm(res.data); // fill form with user data
+        setForm(res.data); 
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
+
     if (userId) fetchUser();
   }, [isLoggedIn, authLoading, userId, router]);
 
-  const onChange = (key: string, value: any) => setForm((prev: any) => ({ ...prev, [key]: value }));
+  const onChange = (key: string, value: any) =>
+    setForm((prev: any) => ({ ...prev, [key]: value }));
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.put(`/api/users/${userId}`, form);
-      setUser(form);
+      const updateData = { ...form };
+      if (password) updateData.password = password; 
+
+      await api.put(`/api/users/${userId}`, updateData);
+      setUser(updateData);
       alert("User updated successfully!");
+      router.push("/dashboard");
+
+      setPassword("");
     } catch (err: any) {
       console.error(err);
       setError(err?.response?.data?.message ?? "Failed to update");
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    setForm(user);
+    setPassword("");
+    router.push("/dashboard");
   };
 
   if (authLoading || loading || !user) return <div>Loading...</div>;
@@ -62,9 +78,49 @@ export default function UserProfilePage() {
       <h2 className="text-2xl font-semibold">{user.name}</h2>
       {error && <p className="text-red-600">{error}</p>}
 
-      {["name","email","role","age","phone","address","city","country","zipCode"].map((field) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium">Email</label>
+          {isAdmin ? (
+            <input
+              type="email"
+              value={form.email ?? ""}
+              onChange={(e) => onChange("email", e.target.value)}
+              className="mt-1 w-full border px-3 py-2 rounded"
+            />
+          ) : (
+            <p className="mt-1">{user.email}</p>
+          )}
+        </div>
+
+        {isAdmin && (
+          <div>
+            <label className="block text-sm font-medium">Password</label>
+            <input
+              type="password"
+              placeholder="Enter new password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 w-full border px-3 py-2 rounded"
+            />
+          </div>
+        )}
+      </div>
+
+      {[
+        "name",
+        "role",
+        "age",
+        "phone",
+        "address",
+        "city",
+        "country",
+        "zipCode",
+      ].map((field) => (
         <div key={field}>
-          <label className="block text-sm font-medium capitalize">{field}</label>
+          <label className="block text-sm font-medium capitalize">
+            {field}
+          </label>
           {isAdmin ? (
             <input
               type={field === "age" ? "number" : "text"}
@@ -79,13 +135,22 @@ export default function UserProfilePage() {
       ))}
 
       {isAdmin && (
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-        >
-          {saving ? "Saving..." : "Save"}
-        </button>
+        <div className="flex gap-3 mt-4">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex-1 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+          <button
+            onClick={handleCancel}
+            type="button"
+            className="flex-1 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+          >
+            Cancel
+          </button>
+        </div>
       )}
     </div>
   );
