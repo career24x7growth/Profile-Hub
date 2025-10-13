@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import User, { IUser } from "../models/user";
-import { registerValidation } from "../validations/authValidation";
 
-// Extending Request
 interface AuthRequest extends Request {
   user?: IUser;
 }
@@ -44,7 +42,6 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    // Optional: only admin can delete
     const currentUser = (req as any).user;
     if (currentUser.role !== "admin") {
       return res.status(403).json({ message: "Access denied" });

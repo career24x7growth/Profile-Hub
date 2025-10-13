@@ -38,7 +38,7 @@ export default function DashboardPage() {
     try {
       await api.delete(`/api/users/${id}`);
       setUsers((prev) => prev.filter((u) => u._id !== id));
-      alert("User deleted successfully!");
+      // alert("User deleted successfully!");
     } catch (err) {
       console.error(err);
       alert("Failed to delete user");
