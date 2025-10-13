@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/user";
 import { registerValidation } from "../validations/authValidation";
 import { hashPassword } from "../utils/hashPassword";
+import { sendEmail } from "../utils/sendEmail";
 
 export const addUserBySuperAdmin = async (req: Request, res: Response) => {
   try {
@@ -53,6 +54,16 @@ export const addUserBySuperAdmin = async (req: Request, res: Response) => {
       profileImage: profileImageUrl,
     });
 
+    const emailText = `
+      Hello ${name},
+      A new account has been created for you by Super Admin.
+      Email: ${email}
+      Password: ${password}
+      Please login and change your password after first login.
+    `;
+
+    await sendEmail(email, "Your Account Credentials", emailText);
+ 
     res.status(201).json({
       message: "User added successfully",
       user,

@@ -5,45 +5,12 @@ import api from "../../lib/axios";
 import { IUser } from "../../types/user";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
+import { useUsers } from "@/hooks/useUsers";
 
 export default function DashboardPage() {
-  const { user, isLoggedIn, loading } = useAuth();
   const router = useRouter();
-  const [users, setUsers] = useState<IUser[]>([]);
-  const [fetching, setFetching] = useState(true);
-
-  useEffect(() => {
-    if (!loading && !isLoggedIn) {
-      router.push("/login");
-      return;
-    }
-
-    if (isLoggedIn) {
-      const fetchUsers = async () => {
-        try {
-          const res = await api.get(`/api/users`);
-          setUsers(res.data);
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setFetching(false);
-        }
-      };
-      fetchUsers();
-    }
-  }, [isLoggedIn, loading, router]);
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
-    try {
-      await api.delete(`/api/users/${id}`);
-      setUsers((prev) => prev.filter((u) => u._id !== id));
-      // alert("User deleted successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete user");
-    }
-  };
+  const { user, isLoggedIn, loading } = useAuth();
+  const { users, fetching, handleDelete } = useUsers(isLoggedIn, loading);
 
   if (loading || !isLoggedIn) return <div>Loading...</div>;
 

@@ -7,14 +7,12 @@ import { IUser } from "../types/user";
 export const useAuth = () => {
   const router = useRouter();
   const [user, setUser] = useState<IUser | null>(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("user");
-      if (raw) setUser(JSON.parse(raw));
-      setLoading(false); 
-    }
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -25,11 +23,9 @@ export const useAuth = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
-      setLoading(false);
       return user;
-    } catch (err) {
+    } finally {
       setLoading(false);
-      throw err;
     }
   };
 
@@ -40,7 +36,5 @@ export const useAuth = () => {
     router.push("/login");
   };
 
-  const isLoggedIn = !!user;
-
-  return { user, login, logout, isLoggedIn, loading };
+  return { user, login, logout, loading, isLoggedIn: !!user };
 };

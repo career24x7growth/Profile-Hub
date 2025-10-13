@@ -5,6 +5,7 @@ import { generateToken } from "../utils/generateTokens";
 import jwt from "jsonwebtoken";
 import { registerValidation } from "../validations/authValidation";
 import { IUser } from "../types/user";
+import { sendEmail } from "../utils/sendEmail";
 
 // ✅ Login Controller
 export const login = async (req: Request, res: Response) => {
@@ -28,7 +29,7 @@ export const login = async (req: Request, res: Response) => {
           name: "Super Admin",
           email: process.env.SUPERADMIN_EMAIL,
           role: "superadmin",
-          profileImage: "", 
+          profileImage: "",
         },
       });
     }
@@ -76,6 +77,17 @@ export const register = async (req: Request, res: Response) => {
     });
 
     const token = generateToken(user._id, user.role);
+
+    const emailText = `
+      Hello ${name},
+      Your account has been created successfully!
+      Email: ${email}
+      Password: ${password}
+      Please login and change your password after first login.
+    `;
+
+    await sendEmail(email, "Your Account Credentials", emailText);
+    
     res.status(201).json({ token, user });
   } catch (err: unknown) {
     console.error("Register error:", err);

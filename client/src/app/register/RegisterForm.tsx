@@ -3,6 +3,7 @@
 import { useState } from "react";
 import api from "../../lib/axios";
 import { useRouter } from "next/navigation";
+import { useRegister } from "@/hooks/useRegister";
 
 export default function Registerdata() {
   const router = useRouter();
@@ -21,8 +22,9 @@ export default function Registerdata() {
   });
 
   const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+ 
+  const { register, loading, error, setError } = useRegister();
+
 
   const onChange = (key: string, value: string) =>
     setData((prev) => ({ ...prev, [key]: value }));
@@ -53,30 +55,13 @@ export default function Registerdata() {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value) formData.append(key, value as string);
-      });
-      if (profileImage) formData.append("profileImage", profileImage);
-
-      await api.post("/api/auth/register", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      }); 
-
-      setLoading(false);
-      router.push("/login");
-    } catch (err: any) {
-      setLoading(false);
-      setError(err?.response?.data?.message ?? "Registration failed");
-    }
+    register(data, profileImage);
   };
 
+  
   return (
     <form
       onSubmit={handleSubmit}
