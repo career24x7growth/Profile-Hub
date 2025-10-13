@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-// interface JwtPayload {
-//   id: string;
-//   role: string;
-// }
+
 
 export const protect = (req: Request & { user?: any }, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;

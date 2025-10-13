@@ -11,5 +11,6 @@ export interface IUser {
   city?: string;
   country?: string;
   zipCode?: string;
+  profileImage?: string;
   createdAt?: string;
 }
