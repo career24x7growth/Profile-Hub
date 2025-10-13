@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import api from "../../lib/axios";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ export default function Registerdata() {
     zipCode: "",
   });
 
+  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -43,6 +45,10 @@ export default function Registerdata() {
       );
       return false;
     }
+    if (!profileImage) {
+      setError("Please upload a profile image");
+      return false;
+    }
     setError(null);
     return true;
   };
@@ -53,9 +59,14 @@ export default function Registerdata() {
 
     setLoading(true);
     try {
-      await api.post("/api/auth/register", {
-        ...data,
-        age: data.age ? Number(data.age) : undefined,
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value) formData.append(key, value as string);
+      });
+      if (profileImage) formData.append("profileImage", profileImage);
+
+      await api.post("/api/auth/register", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       setLoading(false);
@@ -138,6 +149,13 @@ export default function Registerdata() {
           placeholder="ZIP Code"
           value={data.zipCode}
           onChange={(e) => onChange("zipCode", e.target.value)}
+          className="border px-3 py-2 rounded"
+        />
+        {/* Profile Image Upload */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setProfileImage(e.target.files?.[0] || null)}
           className="border px-3 py-2 rounded"
         />
       </div>

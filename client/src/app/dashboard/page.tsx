@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import api from "../../lib/axios";
 import { IUser } from "../../types/user";
@@ -71,10 +72,18 @@ export default function DashboardPage() {
               {/* Avatar and User Info */}
               <div
                 className="flex items-center gap-3 flex-1 justify-center cursor-pointer"
-                onClick={() => router.push(`/user/${u._id}`)} // ✅ Navigate to user details
+                onClick={() => router.push(`/user/${u._id}`)}
               >
-                <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center uppercase font-semibold">
-                  {u.name.charAt(0)}
+                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-blue-500 text-white uppercase font-semibold">
+                  {u.profileImage ? (
+                    <img
+                      src={u.profileImage}
+                      alt={u.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    u.name.charAt(0)
+                  )}
                 </div>
                 <div className="text-center">
                   <div className="font-medium text-gray-800">{u.name}</div>
