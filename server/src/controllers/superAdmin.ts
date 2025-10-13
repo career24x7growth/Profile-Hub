@@ -58,7 +58,7 @@ export const addUserBySuperAdmin = async (req: Request, res: Response) => {
       user,
     });
   } catch (err: any) {
-    console.error("❌ Error in addUserBySuperAdmin:", err);
+    console.error("Error in addUserBySuperAdmin:", err);
     res.status(500).json({ message: "Server Error" });
   }
 };
