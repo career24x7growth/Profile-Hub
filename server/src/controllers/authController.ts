@@ -7,7 +7,6 @@ import { registerValidation } from "../validations/authValidation";
 import { IUser } from "../types/user";
 import { sendEmail } from "../utils/sendEmail";
 
-// ✅ Login Controller
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -59,7 +58,6 @@ export const register = async (req: Request, res: Response) => {
     if (existingUser) return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await hashPassword(password);
-
     const profileImage = req.file?.path || req.file?.filename;
 
     const user: IUser = await User.create({
@@ -78,16 +76,36 @@ export const register = async (req: Request, res: Response) => {
 
     const token = generateToken(user._id, user.role);
 
-    const emailText = `
-      Hello ${name},
-      Your account has been created successfully!
-      Email: ${email}
-      Password: ${password}
-      Please login and change your password after first login.
+    // Enhanced HTML email
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #4CAF50;">Hello ${name},</h2>
+        <p>Your account has been created successfully!</p>
+
+        <table style="border-collapse: collapse; margin-top: 10px;">
+          <tr>
+            <td style="font-weight: bold; padding: 4px 8px;">Email:</td>
+            <td style="padding: 4px 8px;">${email}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 4px 8px;">Password:</td>
+            <td style="padding: 4px 8px;">${password}</td>
+          </tr>
+        </table>
+
+        <p style="margin-top: 10px;">
+          Please <strong>login</strong> and change your password after your first login.
+        </p>
+
+        <p style="margin-top: 20px; color: #888; font-size: 12px;">
+          This is an automated message from your Admin Dashboard.
+        </p>
+      </div>
     `;
 
-    await sendEmail(email, "Your Account Credentials", emailText);
-    
+    // Send email using HTML
+    await sendEmail(email, "Your Account Credentials", `Hello ${name}, your account has been created!`, emailHtml);
+
     res.status(201).json({ token, user });
   } catch (err: unknown) {
     console.error("Register error:", err);
