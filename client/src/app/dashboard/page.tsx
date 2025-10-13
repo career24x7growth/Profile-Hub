@@ -12,7 +12,6 @@ export default function DashboardPage() {
   const [users, setUsers] = useState<IUser[]>([]);
   const [fetching, setFetching] = useState(true);
 
-  // ✅ Fetch users
   useEffect(() => {
     if (!loading && !isLoggedIn) {
       router.push("/login");
@@ -34,7 +33,6 @@ export default function DashboardPage() {
     }
   }, [isLoggedIn, loading, router]);
 
-  // ✅ Delete user function
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
@@ -53,11 +51,23 @@ export default function DashboardPage() {
     <div className="max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-gray-800">Users</h2>
-        {user && (
-          <div className="text-sm text-gray-600">
-            Logged in as <span className="font-medium">{user.name}</span>
-          </div>
-        )}
+
+        <div className="flex items-center gap-4">
+          {user && (
+            <div className="text-sm text-gray-600">
+              Logged in as <span className="font-medium">{user.name}</span>
+            </div>
+          )}
+
+          {user?.role === "superadmin" && (
+            <button
+              onClick={() => router.push("/superadmin/add-user")}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            >
+              Add User
+            </button>
+          )}
+        </div>
       </div>
 
       {fetching ? (
@@ -69,7 +79,6 @@ export default function DashboardPage() {
               key={u._id}
               className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg hover:shadow-lg transition"
             >
-              {/* Avatar and User Info */}
               <div
                 className="flex items-center gap-3 flex-1 justify-center cursor-pointer"
                 onClick={() => router.push(`/user/${u._id}`)}
@@ -91,7 +100,6 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Admin Controls */}
               {user?.role === "admin" && (
                 <div className="flex gap-2">
                   <button

@@ -67,7 +67,7 @@ export default function Registerdata() {
 
       await api.post("/api/auth/register", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-      });
+      }); 
 
       setLoading(false);
       router.push("/login");

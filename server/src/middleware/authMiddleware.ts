@@ -23,7 +23,6 @@ export const protect = (req: Request & { user?: any }, res: Response, next: Next
   }
 };
 
-// roles: ...string[] of allowed roles
 export const authorize = (...roles: string[]) => {
   return (req: Request & { user?: any }, res: Response, next: NextFunction) => {
     if (!req.user) return res.status(401).json({ message: "Not authorized" });

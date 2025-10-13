@@ -3,7 +3,6 @@ import User from "../models/user";
 import { registerValidation } from "../validations/authValidation";
 import { hashPassword } from "../utils/hashPassword";
 
-// POST /api/superadmin/addUser
 export const addUserBySuperAdmin = async (req: Request, res: Response) => {
   try {
     const { error } = registerValidation.validate(req.body);
@@ -11,7 +10,6 @@ export const addUserBySuperAdmin = async (req: Request, res: Response) => {
 
     const { name, email, password, role, age, phone, address, city, country, zipCode } = req.body;
 
-    // Prevent Superadmin from creating another superadmin
     if (role === "superadmin") {
       return res.status(403).json({ message: "Superadmin cannot create another superadmin" });
     }
@@ -35,7 +33,8 @@ export const addUserBySuperAdmin = async (req: Request, res: Response) => {
     });
 
     res.status(201).json({ message: "User added successfully", user });
-  } catch (err) {
+  } catch (err: any) {
+    console.error(err);
     res.status(500).json({ message: "Server Error" });
   }
 };
