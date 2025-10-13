@@ -3,7 +3,7 @@ import User from "../models/user";
 import { comparePassword, hashPassword } from "../utils/hashPassword";
 import { generateToken } from "../utils/generateTokens";
 import jwt from "jsonwebtoken";
-import { registerValidation, loginValidation } from "../validations/authValidation";
+import { registerValidation } from "../validations/authValidation";
 import { IUser } from "../types/user";
 
 // ✅ Login Controller
@@ -28,7 +28,7 @@ export const login = async (req: Request, res: Response) => {
           name: "Super Admin",
           email: process.env.SUPERADMIN_EMAIL,
           role: "superadmin",
-          profileImage: "", // optional
+          profileImage: "", 
         },
       });
     }
