@@ -95,13 +95,10 @@ export default function UserProfilePage() {
   const handleCancel = () => {
     setForm(user);
     setPassword("");
-<<<<<<< HEAD
     router.push("/Components/dashboard");
-=======
     setImageFile(null);
     setImagePreview(null);
-    router.push("/dashboard");
->>>>>>> ee079cd197d587bf3dd07f58fb998ae75617d1e4
+    // router.push("/dashboard");
   };
 
   if (authLoading || loading || !user) return <div>Loading...</div>;

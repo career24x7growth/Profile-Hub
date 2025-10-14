@@ -11,6 +11,13 @@ export default function Navbar() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+
+    const handleStorageChange = () => {
+      setIsLoggedIn(!!localStorage.getItem("token"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   const handleLogout = () => {
@@ -23,12 +30,10 @@ export default function Navbar() {
   return (
     <header className="bg-white shadow sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo / Brand */}
         <Link href="/" className="text-2xl font-bold text-blue-600">
           ProfileHub
         </Link>
 
-        {/* Navigation Links */}
         <nav className="flex items-center gap-6 text-sm font-medium">
           {isLoggedIn ? (
             <>
@@ -47,7 +52,7 @@ export default function Navbar() {
               <Link href="/Components/login" className="hover:text-blue-600 transition">
                 Login
               </Link>
-              <Link href="/register" className="hover:text-blue-600 transition">
+              <Link href="/Components/register" className="hover:text-blue-600 transition">
                 Register
               </Link>
             </>
