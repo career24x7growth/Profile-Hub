@@ -39,7 +39,7 @@ export const login = async (req: Request, res: Response) => {
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
-    const token = generateToken(user._id, user.role);
+    const token = generateToken(user._id as string, user.role);
     res.json({ token, user });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Server Error";
@@ -60,7 +60,7 @@ export const register = async (req: Request, res: Response) => {
     const hashedPassword = await hashPassword(password);
     const profileImage = req.file?.path || req.file?.filename;
 
-    const user: IUser = await User.create({
+    const user = await User.create({
       name,
       email,
       password: hashedPassword,
@@ -74,7 +74,7 @@ export const register = async (req: Request, res: Response) => {
       profileImage,
     });
 
-    const token = generateToken(user._id, user.role);
+    const token = generateToken(user._id as string, user.role);
 
     // Enhanced HTML email
     const emailHtml = `
