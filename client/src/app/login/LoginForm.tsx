@@ -30,6 +30,7 @@ export default function LoginForm() {
     if (!validate()) return;
     try {
       await login(email, password);
+      window.dispatchEvent(new Event('storage'));
       router.push("/dashboard");
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
