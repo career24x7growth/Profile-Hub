@@ -30,7 +30,12 @@ export default function LoginForm() {
     if (!validate()) return;
     try {
       await login(email, password);
+<<<<<<< HEAD:client/src/app/Components/login/LoginForm.tsx
       router.push("/Components/dashboard");
+=======
+      window.dispatchEvent(new Event('storage'));
+      router.push("/dashboard");
+>>>>>>> ee079cd197d587bf3dd07f58fb998ae75617d1e4:client/src/app/login/LoginForm.tsx
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error?.response?.data?.message ?? "Login failed");

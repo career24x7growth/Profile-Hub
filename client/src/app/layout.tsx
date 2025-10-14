@@ -9,13 +9,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if(!token){
-      setIsLoggedIn(false);
-    }
-    setIsLoggedIn(!!token);
-    
-  }, [isLoggedIn]);
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+
+    window.addEventListener('storage', checkAuth);
+    const interval = setInterval(checkAuth, 100);
+
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

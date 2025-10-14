@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -38,3 +39,5 @@ export const useAuth = () => {
 
   return { user, login, logout, loading, isLoggedIn: !!user };
 };
+=======
+>>>>>>> ee079cd197d587bf3dd07f58fb998ae75617d1e4
