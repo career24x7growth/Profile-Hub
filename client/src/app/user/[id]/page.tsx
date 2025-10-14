@@ -21,7 +21,7 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     if (!isLoggedIn && !authLoading) {
-      router.push("/login");
+      router.push("/Components/login");
       return;
     }
 
@@ -52,7 +52,7 @@ export default function UserProfilePage() {
       await api.put(`/api/users/${userId}`, updateData);
       setUser(updateData);
       alert("User updated successfully!");
-      router.push("/dashboard");
+      router.push("/Components/dashboard");
 
       setPassword("");
     } catch (err: any) {
@@ -66,7 +66,7 @@ export default function UserProfilePage() {
   const handleCancel = () => {
     setForm(user);
     setPassword("");
-    router.push("/dashboard");
+    router.push("/Components/dashboard");
   };
 
   if (authLoading || loading || !user) return <div>Loading...</div>;

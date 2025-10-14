@@ -33,7 +33,7 @@ export const useAuth = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-    router.push("/login");
+    router.push("/Components/login");
   };
 
   return { user, login, logout, loading, isLoggedIn: !!user };

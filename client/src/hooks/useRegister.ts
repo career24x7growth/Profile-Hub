@@ -21,7 +21,7 @@ export const useRegister = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      router.push("/login");
+      router.push("/Components/login");
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Registration failed");
     } finally {

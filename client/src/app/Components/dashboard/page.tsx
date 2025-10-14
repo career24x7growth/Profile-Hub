@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "../../lib/axios";
-import { IUser } from "../../types/user";
+import api from "../../../lib/axios";
+import { IUser } from "../../../types/user";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../../hooks/useAuth";
 import { useUsers } from "@/hooks/useUsers";
 
 export default function DashboardPage() {
@@ -28,7 +28,7 @@ export default function DashboardPage() {
 
           {user?.role === "superadmin" && (
             <button
-              onClick={() => router.push("/superadmin/add-user")}
+              onClick={() => router.push("/Components/superadmin/add-user")}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
             >
               Add User

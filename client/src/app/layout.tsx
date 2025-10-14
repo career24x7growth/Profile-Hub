@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
-    router.push("/login");
+    router.push("/Components/login");
   };
 
   return (
@@ -42,16 +42,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   >
                     Logout
                   </button>
-                  <Link href="/dashboard" className="hover:underline">
+                  <Link href="/Components/dashboard" className="hover:underline">
                     Dashboard
                   </Link>
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="hover:underline">
+                  <Link href="/Components/login" className="hover:underline">
                     Login
                   </Link>
-                  <Link href="/register" className="hover:underline">
+                  <Link href="/Components/register" className="hover:underline">
                     Register
                   </Link>
                 </>

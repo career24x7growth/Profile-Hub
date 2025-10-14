@@ -47,7 +47,7 @@ export default function AddUserPage() {
     await addUser(form, profileImage);
   };
 
-  const handleCancel = () => router.push("/dashboard");
+  const handleCancel = () => router.push("/Components/dashboard");
 
   return (
     <form

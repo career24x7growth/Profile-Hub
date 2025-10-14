@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -30,7 +30,7 @@ export default function LoginForm() {
     if (!validate()) return;
     try {
       await login(email, password);
-      router.push("/dashboard");
+      router.push("/Components/dashboard");
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error?.response?.data?.message ?? "Login failed");

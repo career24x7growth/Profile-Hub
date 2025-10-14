@@ -12,21 +12,21 @@ export default function Home() {
 
         <div className="flex gap-4 justify-center">
           <Link
-            href="/login"
+            href="/Components/login"
             className="px-5 py-3 bg-blue-600 text-white rounded-md shadow"
           >
             Login
           </Link>
 
           <Link
-            href="/register"
+            href="/Components/register"
             className="px-5 py-3 border border-blue-600 text-blue-600 rounded-md"
           >
             Register
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/Components/dashboard"
             className="px-5 py-3 bg-gray-100 text-gray-800 rounded-md"
           >
             Dashboard

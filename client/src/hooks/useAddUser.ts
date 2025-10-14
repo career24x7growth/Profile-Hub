@@ -22,7 +22,7 @@ export const useAddUser = () => {
       });
 
       alert("User added successfully!");
-      router.push("/dashboard");
+      router.push("/Components/dashboard");
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Failed to add user");
     } finally {
