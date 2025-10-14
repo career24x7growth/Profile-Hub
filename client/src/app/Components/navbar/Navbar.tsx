@@ -6,14 +6,35 @@ import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
     setIsLoggedIn(!!token);
 
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        setUserRole(userData.role || "");
+      } catch (e) {
+        setUserRole("");
+      }
+    }
+
     const handleStorageChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
+      const updatedToken = localStorage.getItem("token");
+      const updatedUser = localStorage.getItem("user");
+      setIsLoggedIn(!!updatedToken);
+      if (updatedUser) {
+        try {
+          const userData = JSON.parse(updatedUser);
+          setUserRole(userData.role || "");
+        } catch (e) {
+          setUserRole("");
+        }
+      }
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -40,6 +61,14 @@ export default function Navbar() {
               <Link href="/Components/dashboard" className="hover:text-blue-600 transition">
                 Dashboard
               </Link>
+              <Link href="/Components/chat" className="hover:text-blue-600 transition">
+                Messages
+              </Link>
+              {(userRole === "admin" || userRole === "superadmin") && (
+                <Link href="/Components/admin-chat" className="hover:text-blue-600 transition">
+                  Admin Chat
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="text-red-600 hover:text-red-700 transition"

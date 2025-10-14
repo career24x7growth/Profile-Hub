@@ -5,6 +5,7 @@ import { connectDB } from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import superAdminRoutes from "./routes/superAdmin";
+import chatRoutes from "./routes/chatRoutes";
 
 
 
@@ -21,6 +22,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/superadmin", superAdminRoutes);
+app.use("/api/chat", chatRoutes);
 
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
