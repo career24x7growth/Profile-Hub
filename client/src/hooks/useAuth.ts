@@ -36,5 +36,5 @@ export const useAuth = () => {
     router.push("/Components/login");
   };
 
-  return { user, login, logout, loading, isLoggedIn: !!user };
+  return { user, login, logout, loading, setLoading, isLoggedIn: !!user };
 };

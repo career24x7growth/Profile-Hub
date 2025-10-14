@@ -1,17 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../hooks/useAuth";
 
 export default function LoginForm() {
   const router = useRouter();
-  const { login, loading } = useAuth();
+  const { login, loading, setLoading } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const validate = () => {
+  const validate = useCallback(() => {
     const emailRegex = /^\S+@\S+\.\S+$/;
     if (!emailRegex.test(email)) {
       setError("Enter a valid email");
@@ -23,20 +23,25 @@ export default function LoginForm() {
     }
     setError(null);
     return true;
-  };
+  }, [email, password]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    try {
-      await login(email, password);
-      router.push("/Components/dashboard");
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!validate()) return;
+      setLoading(true);
+      try {
+        await login(email, password);
+        router.push("/Components/dashboard");
+      } catch (err: any) {
+        setError(err?.response?.data?.message || "Login failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [email, password, login, router, validate]
+  );
 
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error?.response?.data?.message ?? "Login failed");
-    }
-  };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">

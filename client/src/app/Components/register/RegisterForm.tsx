@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import api from "../../../lib/axios";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useRegister } from "@/hooks/useRegister";
 
-export default function Registerdata() {
+const RegisterForm = () => {
   const router = useRouter();
+  const { register, loading, error, setError } = useRegister();
 
   const [data, setData] = useState({
     name: "",
@@ -22,17 +22,17 @@ export default function Registerdata() {
   });
 
   const [profileImage, setProfileImage] = useState<File | null>(null);
- 
-  const { register, loading, error, setError } = useRegister();
-
-
-  const onChange = (key: string, value: string) =>
-    setData((prev) => ({ ...prev, [key]: value }));
 
   const passwordPattern =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
-  const validate = () => {
+  const onChange = useCallback(
+    (key: string, value: string) =>
+      setData((prev) => ({ ...prev, [key]: value })),
+    []
+  );
+
+  const validate = useCallback(() => {
     if (!data.name || data.name.length < 3) {
       setError("Name must be at least 3 characters");
       return false;
@@ -53,15 +53,17 @@ export default function Registerdata() {
     }
     setError(null);
     return true;
-  };
+  }, [data, profileImage, setError]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    register(data, profileImage);
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!validate()) return;
+      register(data, profileImage);
+    },
+    [data, profileImage, register, validate]
+  );
 
-  
   return (
     <form
       onSubmit={handleSubmit}
@@ -72,71 +74,40 @@ export default function Registerdata() {
       {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <input
-          placeholder="Name"
-          value={data.name}
-          onChange={(e) => onChange("name", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <input
-          placeholder="Email"
-          type="email"
-          value={data.email}
-          onChange={(e) => onChange("email", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={data.password}
-          onChange={(e) => onChange("password", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <select
-          value={data.role}
-          onChange={(e) => onChange("role", e.target.value)}
-          className="border px-3 py-2 rounded"
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <input
-          placeholder="Age"
-          value={data.age}
-          onChange={(e) => onChange("age", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <input
-          placeholder="Phone"
-          value={data.phone}
-          onChange={(e) => onChange("phone", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <input
-          placeholder="Address"
-          value={data.address}
-          onChange={(e) => onChange("address", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <input
-          placeholder="City"
-          value={data.city}
-          onChange={(e) => onChange("city", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <input
-          placeholder="Country"
-          value={data.country}
-          onChange={(e) => onChange("country", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <input
-          placeholder="ZIP Code"
-          value={data.zipCode}
-          onChange={(e) => onChange("zipCode", e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        {/* Profile Image Upload */}
+        {[
+          { key: "name", type: "text", placeholder: "Name" },
+          { key: "email", type: "email", placeholder: "Email" },
+          { key: "password", type: "password", placeholder: "Password" },
+          { key: "role", type: "select", placeholder: "" },
+          { key: "age", type: "number", placeholder: "Age" },
+          { key: "phone", type: "text", placeholder: "Phone" },
+          { key: "address", type: "text", placeholder: "Address" },
+          { key: "city", type: "text", placeholder: "City" },
+          { key: "country", type: "text", placeholder: "Country" },
+          { key: "zipCode", type: "text", placeholder: "ZIP Code" },
+        ].map((field) =>
+          field.type === "select" ? (
+            <select
+              key={field.key}
+              value={data.role}
+              onChange={(e) => onChange("role", e.target.value)}
+              className="border px-3 py-2 rounded"
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          ) : (
+            <input
+              key={field.key}
+              type={field.type}
+              placeholder={field.placeholder}
+              value={data[field.key as keyof typeof data]}
+              onChange={(e) => onChange(field.key, e.target.value)}
+              className="border px-3 py-2 rounded"
+            />
+          )
+        )}
+
         <input
           type="file"
           accept="image/*"
@@ -154,4 +125,6 @@ export default function Registerdata() {
       </button>
     </form>
   );
-}
+};
+
+export default RegisterForm;
