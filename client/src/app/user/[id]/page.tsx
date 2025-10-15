@@ -29,7 +29,7 @@ export default function UserProfilePage() {
 
     const fetchUser = async () => {
       try {
-        const res = await api.get(`/api/users/${userId}`);
+        const res = await api.get(`/users/${userId}`);
         setUser(res.data);
         setForm(res.data); 
       } catch (err) {
@@ -71,7 +71,7 @@ export default function UserProfilePage() {
       if (password) formData.append('password', password);
       if (imageFile) formData.append('profileImage', imageFile);
 
-      const response = await api.put(`/api/users/${userId}`, formData, {
+      const response = await api.put(`/users/${userId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

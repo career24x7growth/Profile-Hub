@@ -17,7 +17,7 @@ export const useRegister = () => {
       });
       if (profileImage) formData.append("profileImage", profileImage);
 
-      await api.post("/api/auth/register", formData, {
+      await api.post("/auth/register", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

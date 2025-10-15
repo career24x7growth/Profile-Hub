@@ -11,7 +11,7 @@ export const useUsers = (isLoggedIn: boolean, loading: boolean) => {
     if (!loading && isLoggedIn) {
       const fetchUsers = async () => {
         try {
-          const res = await api.get("/api/users");
+          const res = await api.get("/users");
           setUsers(res.data);
         } catch (err) {
           console.error("Failed to fetch users:", err);
@@ -26,7 +26,7 @@ export const useUsers = (isLoggedIn: boolean, loading: boolean) => {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
-      await api.delete(`/api/users/${id}`);
+      await api.delete(`/users/${id}`);
       setUsers((prev) => prev.filter((u) => u._id !== id));
     } catch (err) {
       console.error("Delete failed:", err);

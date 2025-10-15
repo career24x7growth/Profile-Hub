@@ -17,7 +17,7 @@ export const useAddUser = () => {
       });
       if (profileImage) formData.append("profileImage", profileImage);
 
-      await api.post("/api/superadmin/addUser", formData, {
+      await api.post("/superadmin/addUser", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
