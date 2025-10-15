@@ -11,7 +11,7 @@ interface NewChatModalProps {
 }
 
 export default function NewChatModal({ isOpen, onClose, onSuccess }: NewChatModalProps) {
-  const { users } = useUsers();
+  const { users } = useUsers(true, false);
   const { createConversation, loading } = useCreateConversation();
   const [type, setType] = useState<"direct" | "group">("direct");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
